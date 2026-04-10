@@ -1,6 +1,9 @@
-import re
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 from collections.abc import Iterable, Sequence
 from typing import TYPE_CHECKING
+
+import regex as re
 
 from vllm.entrypoints.openai.engine.protocol import DeltaMessage
 from vllm.logger import init_logger
@@ -71,7 +74,7 @@ class HyperCLOVAXReasoningParser(ReasoningParser):
                     return True
         return False
 
-    def is_reasoning_end(self, input_ids: list[int]) -> bool:
+    def is_reasoning_end(self, input_ids: Sequence[int]) -> bool:
         if len(input_ids) > 1:
             for think_end_tokens in self.think_end_tokens:
                 think_end_len = len(think_end_tokens)

@@ -1,13 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 import json
 import os
 
 import pytest
 from transformers import AutoTokenizer
-from vllm.tokenizers import TokenizerLike
-from vllm.tool_parsers.hyperclovax_tool_parser import HyperCLOVAXToolParser
 
 from tests.tool_parsers.common_tests import ToolParserTestConfig, ToolParserTests
 from tests.tool_parsers.utils import run_tool_extraction
+from vllm.tokenizers import TokenizerLike
+from vllm.tool_parsers.hyperclovax_tool_parser import HyperCLOVAXToolParser
 
 TOKENIZER_NAME = "naver-hyperclovax/HyperCLOVAX-SEED-Think-32B"
 

@@ -1,16 +1,15 @@
-import os
-
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 import pytest
-from vllm.entrypoints.openai.chat_completion.protocol import ChatCompletionRequest
-from vllm.reasoning import ReasoningParser, ReasoningParserManager
+from transformers import AutoTokenizer
 
 from tests.reasoning.utils import (
     StreamingReasoningReconstructor,
     run_reasoning_extraction,
     run_reasoning_extraction_streaming,
 )
-from transformers import AutoTokenizer
-
+from vllm.entrypoints.openai.chat_completion.protocol import ChatCompletionRequest
+from vllm.reasoning import ReasoningParser, ReasoningParserManager
 
 PARSER_NAME = "hyperclovax"
 
@@ -33,7 +32,9 @@ def hyperclovax_tokenizer():
 
 @pytest.fixture
 def parser(hyperclovax_tokenizer) -> ReasoningParser:
-    return ReasoningParserManager.get_reasoning_parser(PARSER_NAME)(hyperclovax_tokenizer)
+    return ReasoningParserManager.get_reasoning_parser(PARSER_NAME)(
+        hyperclovax_tokenizer
+    )
 
 
 def test_hyperclovax_reasoning_parser_creation(hyperclovax_tokenizer):
@@ -48,7 +49,10 @@ def request_auto() -> ChatCompletionRequest:
 
 
 REASONING_WITH_CONTENT = {
-    "output": THINK_START + "This is reasoning.\n" + THINK_END_BASE + "\nThis is the answer.",
+    "output": THINK_START
+    + "This is reasoning.\n"
+    + THINK_END_BASE
+    + "\nThis is the answer.",
     "reasoning": "This is reasoning.\n",
     "content": "\nThis is the answer.",
 }
@@ -73,7 +77,11 @@ NO_THINKING_NONSTREAM = {
 }
 
 TOOL_CALL_AFTER_THINK_NONSTREAM = {
-    "output": THINK_START + "Let me check.\n" + THINK_END_BASE + FUNCTION_CALL_ROLE + _tool_payload(),
+    "output": THINK_START
+    + "Let me check.\n"
+    + THINK_END_BASE
+    + FUNCTION_CALL_ROLE
+    + _tool_payload(),
     "reasoning": "Let me check.\n",
     "content": FUNCTION_CALL_ROLE + _tool_payload(),
 }
@@ -86,7 +94,10 @@ DIRECT_TOOL_CALL_NONSTREAM = {
 }
 
 MULTILINE_REASONING = {
-    "output": THINK_START + "Line one.\nLine two.\n" + THINK_END_BASE + "\nFinal answer.",
+    "output": THINK_START
+    + "Line one.\nLine two.\n"
+    + THINK_END_BASE
+    + "\nFinal answer.",
     "reasoning": "Line one.\nLine two.\n",
     "content": "\nFinal answer.",
 }
@@ -115,7 +126,11 @@ NO_THINKING_STREAM = {
 }
 
 TOOL_CALL_AFTER_THINK_STREAM = {
-    "output": THINK_START + "Let me check.\n" + THINK_END_BASE + FUNCTION_CALL_ROLE + _tool_payload(),
+    "output": THINK_START
+    + "Let me check.\n"
+    + THINK_END_BASE
+    + FUNCTION_CALL_ROLE
+    + _tool_payload(),
     "reasoning": "Let me check.\n",
     "content": _tool_payload(),
 }
@@ -162,7 +177,9 @@ def test_extract_reasoning_nonstreaming(
         parser.model_tokenizer.convert_tokens_to_string([tok])
         for tok in parser.model_tokenizer.tokenize(param_dict["output"])
     ]
-    reasoning, content = run_reasoning_extraction(parser, output_tokens, request=request, streaming=False)
+    reasoning, content = run_reasoning_extraction(
+        parser, output_tokens, request=request, streaming=False
+    )
 
     assert reasoning == param_dict["reasoning"]
     assert content == param_dict["content"]
@@ -173,13 +190,17 @@ def test_extract_reasoning_streaming(
     param_dict: dict,
     hyperclovax_tokenizer,
 ):
-    fresh_parser = ReasoningParserManager.get_reasoning_parser(PARSER_NAME)(hyperclovax_tokenizer)
+    fresh_parser = ReasoningParserManager.get_reasoning_parser(PARSER_NAME)(
+        hyperclovax_tokenizer
+    )
 
     output_tokens = [
         hyperclovax_tokenizer.convert_tokens_to_string([tok])
         for tok in hyperclovax_tokenizer.tokenize(param_dict["output"])
     ]
-    reasoning, content = run_reasoning_extraction(fresh_parser, output_tokens, streaming=True)
+    reasoning, content = run_reasoning_extraction(
+        fresh_parser, output_tokens, streaming=True
+    )
 
     assert reasoning == param_dict["reasoning"]
     assert content == param_dict["content"]
@@ -191,7 +212,9 @@ def test_is_reasoning_end_true_with_newline_variant(parser: ReasoningParser):
 
 
 def test_is_reasoning_end_true_with_content_after_end(parser: ReasoningParser):
-    ids = parser.model_tokenizer.encode(THINK_START + "hello" + THINK_END_BASE + FUNCTION_CALL_ROLE)
+    ids = parser.model_tokenizer.encode(
+        THINK_START + "hello" + THINK_END_BASE + FUNCTION_CALL_ROLE
+    )
     assert parser.is_reasoning_end(ids) is True
 
 
@@ -210,13 +233,21 @@ def test_is_reasoning_end_true_single_end_token(parser: ReasoningParser):
 
 
 def test_is_reasoning_end_streaming_true_on_end_token_delta(parser: ReasoningParser):
-    assert parser.is_reasoning_end_streaming([parser.end_token_id], [parser.end_token_id]) is True
+    assert (
+        parser.is_reasoning_end_streaming([parser.end_token_id], [parser.end_token_id])
+        is True
+    )
 
 
 def test_is_reasoning_end_streaming_false_without_end_token_delta(
     parser: ReasoningParser,
 ):
-    assert parser.is_reasoning_end_streaming([parser.end_token_id], [parser.end_token_id + 1]) is False
+    assert (
+        parser.is_reasoning_end_streaming(
+            [parser.end_token_id], [parser.end_token_id + 1]
+        )
+        is False
+    )
 
 
 def test_is_reasoning_end_false_empty_sequence(parser: ReasoningParser):
@@ -281,8 +312,12 @@ def test_streaming_multi_token_deltas(
     expected_content: str | None,
     hyperclovax_tokenizer,
 ):
-    fresh_parser = ReasoningParserManager.get_reasoning_parser(PARSER_NAME)(hyperclovax_tokenizer)
-    reconstructor: StreamingReasoningReconstructor = run_reasoning_extraction_streaming(fresh_parser, deltas)
+    fresh_parser = ReasoningParserManager.get_reasoning_parser(PARSER_NAME)(
+        hyperclovax_tokenizer
+    )
+    reconstructor: StreamingReasoningReconstructor = run_reasoning_extraction_streaming(
+        fresh_parser, deltas
+    )
 
     assert reconstructor.reasoning == expected_reasoning
     assert (reconstructor.other_content or None) == expected_content
@@ -294,7 +329,9 @@ def test_force_reasoning_treats_all_as_reasoning(parser: ReasoningParser):
         model="test-model",
         chat_template_kwargs={"force_reasoning": True},
     )
-    reasoning, content = parser.extract_reasoning("No think marker but forced.", request)
+    reasoning, content = parser.extract_reasoning(
+        "No think marker but forced.", request
+    )
     assert reasoning == "No think marker but forced."
     assert content is None
 
@@ -305,7 +342,9 @@ def test_skip_reasoning_returns_all_as_content(parser: ReasoningParser):
         model="test-model",
         chat_template_kwargs={"skip_reasoning": True},
     )
-    reasoning, content = parser.extract_reasoning(THINK_START + "This should be content.", request)
+    reasoning, content = parser.extract_reasoning(
+        THINK_START + "This should be content.", request
+    )
     assert reasoning is None
     assert content == THINK_START + "This should be content."
 
