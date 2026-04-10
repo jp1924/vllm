@@ -28,15 +28,7 @@ def _tool_payload(name: str = "search", args: str = '{"query":"weather"}') -> st
 
 @pytest.fixture(scope="module")
 def hyperclovax_tokenizer():
-    local_candidates = [os.environ.get("HCX_TOKENIZER_PATH"), TOKENIZER_NAME]
-    for path in local_candidates:
-        if path and os.path.isdir(path):
-            return AutoTokenizer.from_pretrained(path, local_files_only=True)
-
-    pytest.skip(
-        "Local HyperCLOVAX tokenizer is required. Set HCX_TOKENIZER_PATH or "
-        "place tokenizer under naver-hyperclovax/HyperCLOVAX-SEED-Think-32B"
-    )
+    return AutoTokenizer.from_pretrained(TOKENIZER_NAME)
 
 
 @pytest.fixture
