@@ -48,6 +48,10 @@ _REASONING_PARSERS_TO_REGISTER = {
         "deepseek_v3_reasoning_parser",
         "DeepSeekV3ReasoningWithThinkingParser",
     ),
+    "hyperclovax": (
+        "hyperclovax_reasoning_parser",
+        "HyperCLOVAXReasoningParser",
+    ),
     "hunyuan_a13b": (
         "hunyuan_a13b_reasoning_parser",
         "HunyuanA13BReasoningParser",

@@ -62,6 +62,10 @@ _TOOL_PARSERS_TO_REGISTER = {
         "hermes_tool_parser",
         "Hermes2ProToolParser",
     ),
+    "hyperclovax": (
+        "hyperclovax_tool_parser",
+        "HyperCLOVAXToolParser",
+    ),
     "hunyuan_a13b": (
         "hunyuan_a13b_tool_parser",
         "HunyuanA13BToolParser",
